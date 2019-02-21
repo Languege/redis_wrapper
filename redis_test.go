@@ -46,5 +46,35 @@ func BenchmarkRedis_HSet(b *testing.B) {
 }
 
 
+func TestSet(t *testing.T) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+
+	err := Set("test", []byte("value"), 60, 0, false, false)
+	if err != nil {
+		t.FailNow()
+	}
+}
+
+func TestZAdd(t *testing.T) {
+
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+
+	err := ZAdd("zset_test", 1.00, []byte("value"))
+	if err != nil {
+		t.FailNow()
+	}
+}
+
+func TestZRangeByScore(t *testing.T) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+
+	values, err := ZRangeByScore("zset_test", 0.0, 2.1, false, 0, 0)
+	t.Log(values, err)
+	if err != nil {
+		t.FailNow()
+	}
+}
+
+
 
 

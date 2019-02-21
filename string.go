@@ -2,8 +2,6 @@ package redis_wrapper
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"fmt"
-	"strconv"
 )
 
 /**
@@ -25,22 +23,31 @@ func Set(key string, value []byte, ex int, px int, nx bool, xx bool) error {
 
 	var err error
 
-	commandName := fmt.Sprintf("SET %s %s", key, string(value))
 	if ex > 0 {
-		commandName += " EX " + strconv.Itoa(ex)
+		if nx {
+			_, err = conn.Do("SET", key, value, "EX", ex, "NX")
+		}else if xx {
+			_, err = conn.Do("SET", key, value, "EX", ex, "XX")
+		}else{
+			_, err = conn.Do("SET", key, value, "EX", ex)
+		}
+	}else if px > 0 {
+		if nx {
+			_, err = conn.Do("SET", key, value, "PX", px, "NX")
+		}else if xx {
+			_, err = conn.Do("SET", key, value, "PX", px, "XX")
+		}else{
+			_, err = conn.Do("SET", key, value, "PX", px)
+		}
+	}else{
+		if nx {
+			_, err = conn.Do("SET", key, value, "NX")
+		}else if xx {
+			_, err = conn.Do("SET", key, value, "XX")
+		}else{
+			_, err = conn.Do("SET", key, value)
+		}
 	}
-
-	if px > 0 {
-		commandName += " EX " + strconv.Itoa(px)
-	}
-
-	if nx {
-		commandName += " NX"
-	}else if xx {
-		commandName += " XX"
-	}
-
-	_, err = conn.Do("SET", key, value)
 
 	return err
 }
