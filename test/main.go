@@ -4,6 +4,7 @@ import (
 	"Languege/redis_wrapper"
 	"fmt"
 	"time"
+	"github.com/gomodule/redigo/redis"
 )
 
 /**
@@ -23,10 +24,28 @@ func main(){
 		fmt.Println(k, string(v.([]byte)))
 	}
 
-	uniqueID, err := redis_wrapper.TryLock("dlock", 1000)
-	time.Sleep(time.Duration(1) * time.Minute)
+	//uniqueID, err := redis_wrapper.TryLock("dlock", 1000)
+	//time.Sleep(time.Duration(1) * time.Minute)
+	//if err == nil {
+	//	redis_wrapper.Release("dlock", uniqueID)
+	//}
+
+	//发布订阅测试
+	pubSubConn := redis.PubSubConn{Conn:redis_wrapper.GetConn()}
+
+	err = pubSubConn.Subscribe("test_channel")
 	if err == nil {
-		redis_wrapper.Release("dlock", uniqueID)
+		data := pubSubConn.ReceiveWithTimeout(time.Second)
+		fmt.Println(data)
+
+		for {
+			data = pubSubConn.Receive()
+			msg, ok :=  data.(redis.Message)
+			if ok {
+				fmt.Println(msg, ok)
+			}
+		}
 	}
+
 
 }

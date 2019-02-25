@@ -68,3 +68,8 @@ func closeConnection() {
 		os.Exit(0)
 	}()
 }
+
+
+func GetConn() redis.Conn{
+	return pool.Get()
+}
