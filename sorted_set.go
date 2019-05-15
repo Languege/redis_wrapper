@@ -9,24 +9,24 @@ import (
  *2019/2/20 5:32 PM
  **/
 
- func ZAdd(key string, score float64, value []byte)  error {
- 	conn := pool.Get()
- 	defer conn.Close()
+func ZAdd(key string, score float64, value interface{})  error {
+	conn := pool.Get()
+	defer conn.Close()
 
- 	var err error
- 	_, err = conn.Do("ZADD", key, score, value)
- 	return err
- }
+	var err error
+	_, err = conn.Do("ZADD", key, score, value)
+	return err
+}
 
- func ZCard(key string) (size int64, err error) {
-	 conn := pool.Get()
-	 defer conn.Close()
+func ZCard(key string) (size int64, err error) {
+	conn := pool.Get()
+	defer conn.Close()
 
-	 return redis.Int64(conn.Do("ZCard", key))
- }
+	return redis.Int64(conn.Do("ZCard", key))
+}
 
 
- //根据score获取数据
+//根据score获取数据
 func ZRangeByScore(key string, min float64, max float64, withScores bool, offset int, count int)(values []interface{}, err error)  {
 	conn := pool.Get()
 	defer conn.Close()
@@ -71,18 +71,18 @@ func ZRevRangeByScore(key string, min float64, max float64, withScores bool, off
 	return
 }
 
- func ZRange(key string, start int, stop int, withScores bool) (values []interface{}, err error) {
-	 conn := pool.Get()
-	 defer conn.Close()
+func ZRange(key string, start int, stop int, withScores bool) (values []interface{}, err error) {
+	conn := pool.Get()
+	defer conn.Close()
 
-	 if withScores {
-	 	values, err = redis.Values(conn.Do("ZRANGE", key, start, stop, "WITHSCORES"))
-	 }else{
-	 	values, err = redis.Values(conn.Do("ZRANGE", key, start, stop))
-	 }
+	if withScores {
+		values, err = redis.Values(conn.Do("ZRANGE", key, start, stop, "WITHSCORES"))
+	}else{
+		values, err = redis.Values(conn.Do("ZRANGE", key, start, stop))
+	}
 
- 	return
- }
+	return
+}
 
 func ZRevRange(key string, start int, stop int, withScores bool) (values []interface{}, err error) {
 	conn := pool.Get()
@@ -97,19 +97,35 @@ func ZRevRange(key string, start int, stop int, withScores bool) (values []inter
 	return
 }
 
- func ZIncreBy(key string, increment float64, member interface{})(err error) {
-	 conn := pool.Get()
-	 defer conn.Close()
+func ZIncreBy(key string, increment float64, member interface{})(err error) {
+	conn := pool.Get()
+	defer conn.Close()
 
-	 _, err = conn.Do("ZINCRBY", key, increment, member)
-	 return
- }
+	_, err = conn.Do("ZINCRBY", key, increment, member)
+	return
+}
 
- //移除一个元素
- func ZRem(key string, member interface{})(err error) {
-	 conn := pool.Get()
-	 defer conn.Close()
+//移除一个元素
+func ZRem(key string, member interface{})(err error) {
+	conn := pool.Get()
+	defer conn.Close()
 
-	 _, err = conn.Do("ZREM", key, member)
-	 return
- }
+	_, err = conn.Do("ZREM", key, member)
+	return
+}
+
+func ZRank(key string, member interface{})(index int64, err error) {
+	conn := pool.Get()
+	defer conn.Close()
+
+	index, err = redis.Int64(conn.Do("ZRANK", key, member))
+	return
+}
+
+func ZRevRank(key string, member interface{})(index int64, err error) {
+	conn := pool.Get()
+	defer conn.Close()
+
+	index, err = redis.Int64(conn.Do("ZREVRANK", key, member))
+	return
+}
