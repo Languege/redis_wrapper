@@ -76,9 +76,9 @@ func ZRevRangeByScore(key string, min float64, max float64, withScores bool, off
 	 defer conn.Close()
 
 	 if withScores {
-	 	_, err = conn.Do("ZRANGE", key, start, stop, "WITHSCORES")
+	 	values, err = redis.Values(conn.Do("ZRANGE", key, start, stop, "WITHSCORES"))
 	 }else{
-		 _, err = conn.Do("ZRANGE", key, start, stop)
+	 	values, err = redis.Values(conn.Do("ZRANGE", key, start, stop))
 	 }
 
  	return
@@ -89,9 +89,9 @@ func ZRevRange(key string, start int, stop int, withScores bool) (values []inter
 	defer conn.Close()
 
 	if withScores {
-		_, err = conn.Do("ZREVRANGE", key, start, stop, "WITHSCORES")
+		values, err = redis.Values(conn.Do("ZREVRANGE", key, start, stop, "WITHSCORES"))
 	}else{
-		_, err = conn.Do("ZREVRANGE", key, start, stop)
+		values, err = redis.Values(conn.Do("ZREVRANGE", key, start, stop))
 	}
 
 	return
