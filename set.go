@@ -26,7 +26,7 @@ func SCard(key string)(size int, err error) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	_, err = redis.Int(conn.Do("SREM", key))
+	size, err = redis.Int(conn.Do("SREM", key))
 	return
 }
 
@@ -34,7 +34,7 @@ func SPop(key string)(value interface{}, err error){
 	conn := pool.Get()
 	defer conn.Close()
 
-	_, err = redis.Int(conn.Do("SPOP", key))
+	value, err = redis.Int(conn.Do("SPOP", key))
 	return
 }
 
@@ -42,7 +42,14 @@ func SMembers(key string)(values []interface{}, err error) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	_, err = redis.Values(conn.Do("SMembers", key))
+	values, err = redis.Values(conn.Do("SMEMBERS", key))
 	return
 }
 
+func SRandMember(key string, count int)(values []interface{}, err error){
+	conn := pool.Get()
+	defer conn.Close()
+
+	values, err = redis.Values(conn.Do("SRANDMEMBER", key, count))
+	return
+}

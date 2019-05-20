@@ -3,8 +3,7 @@ package main
 import (
 	"Languege/redis_wrapper"
 	"fmt"
-	"time"
-	"github.com/gomodule/redigo/redis"
+	"strconv"
 )
 
 /**
@@ -31,21 +30,32 @@ func main(){
 	//}
 
 	//发布订阅测试
-	pubSubConn := redis.PubSubConn{Conn:redis_wrapper.GetConn()}
+	//pubSubConn := redis.PubSubConn{Conn:redis_wrapper.GetConn()}
+	//
+	//err = pubSubConn.Subscribe("test_channel")
+	//if err == nil {
+	//	data := pubSubConn.ReceiveWithTimeout(time.Second)
+	//	fmt.Println(data)
+	//
+	//	for {
+	//		data = pubSubConn.Receive()
+	//		msg, ok :=  data.(redis.Message)
+	//		if ok {
+	//			fmt.Println(msg, ok)
+	//		}
+	//	}
+	//}
 
-	err = pubSubConn.Subscribe("test_channel")
-	if err == nil {
-		data := pubSubConn.ReceiveWithTimeout(time.Second)
-		fmt.Println(data)
-
-		for {
-			data = pubSubConn.Receive()
-			msg, ok :=  data.(redis.Message)
-			if ok {
-				fmt.Println(msg, ok)
-			}
-		}
+	//集合随机数测试
+	for i := 0; i< 100;i++ {
+		redis_wrapper.SAdd("skey", i)
 	}
 
-
+	ml, err := redis_wrapper.SRandMember("skey", 10)
+	if err == nil {
+		for _, v := range ml {
+			member, _ := strconv.ParseInt(string(v.([]byte)), 10, 64)
+			fmt.Println(member)
+		}
+	}
 }

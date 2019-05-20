@@ -8,10 +8,11 @@ import (
 
 //goos: darwin
 //goarch: amd64
-//pkg: skddj/redis
-//BenchmarkRedis_Del-8    	   20000	     79356 ns/op
-//BenchmarkRedis_Set-8    	   20000	     77270 ns/op
-//BenchmarkRedis_HSet-8   	   20000	     79877 ns/op
+//pkg: Languege/redis_wrapper
+//BenchmarkRedis_Del-8     	   20000	     74581 ns/op
+//BenchmarkRedis_Set-8     	   20000	     71803 ns/op
+//BenchmarkRedis_HSet-8    	   20000	     77275 ns/op
+//BenchmarkSRandMember-8   	   20000	     90124 ns/op
 //PASS
 
 func BenchmarkRedis_Del(b *testing.B) {
@@ -45,6 +46,21 @@ func BenchmarkRedis_HSet(b *testing.B) {
 	}
 }
 
+func BenchmarkSRandMember(b *testing.B) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+
+	for i := 0; i< 100;i++ {
+		SAdd("skey", i)
+	}
+
+	var err error
+	for i := 0; i < b.N ; i++  {
+		_, err = SRandMember("skey",  10)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
 
 func TestSet(t *testing.T) {
 	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
