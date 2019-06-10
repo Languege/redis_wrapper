@@ -38,3 +38,11 @@ func HDel(key, field string) error {
 
 	return err
 }
+
+func HGetAll(key string)(values []interface{}, err error){
+	conn := pool.Get()
+	defer conn.Close()
+
+	values, err = redis.Values(conn.Do("HGETALL", key))
+	return
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"Languege/redis_wrapper"
 	"fmt"
+	"go-common/app/common/openplatform/encoding"
 	"strconv"
 )
 
@@ -47,15 +48,26 @@ func main(){
 	//}
 
 	//集合随机数测试
-	for i := 0; i< 100;i++ {
-		redis_wrapper.SAdd("skey", i)
+	//for i := 0; i< 100;i++ {
+	//	redis_wrapper.SAdd("skey", i)
+	//}
+	//
+	//ml, err := redis_wrapper.SRandMember("skey", 10)
+	//if err == nil {
+	//	for _, v := range ml {
+	//		member, _ := strconv.ParseInt(string(v.([]byte)), 10, 64)
+	//		fmt.Println(member)
+	//	}
+	//}
+
+	for i := 0; i< 10;i++ {
+		redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte(encoding.JSON("field" + strconv.Itoa(i))))
 	}
 
-	ml, err := redis_wrapper.SRandMember("skey", 10)
+	values, err = redis_wrapper.HGetAll("hashtable")
 	if err == nil {
-		for _, v := range ml {
-			member, _ := strconv.ParseInt(string(v.([]byte)), 10, 64)
-			fmt.Println(member)
+		for i := 0; i < len(values); i+=2  {
+			fmt.Println(string(values[i].([]byte)), string(values[i+1].([]byte)))
 		}
 	}
 }
