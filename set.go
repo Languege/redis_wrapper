@@ -53,3 +53,11 @@ func SRandMember(key string, count int)(values []interface{}, err error){
 	values, err = redis.Values(conn.Do("SRANDMEMBER", key, count))
 	return
 }
+
+func SIsMember(key string, member interface{})(value bool, err error){
+	conn := pool.Get()
+	defer conn.Close()
+
+	value, err = redis.Bool(conn.Do("SISMEMBER", key, member))
+	return
+}
