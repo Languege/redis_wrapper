@@ -2,7 +2,6 @@ package redis_wrapper
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"github.com/davyxu/golog"
 	"time"
 	"os"
 	"os/signal"
@@ -15,7 +14,6 @@ import (
  **/
 var (
 	pool *redis.Pool
-	ilog = golog.New("redis_client")
 )
 
 
@@ -28,7 +26,7 @@ func InitConnect(ip string, port string, password string) {
 
 	pool =  &redis.Pool{
 
-		MaxIdle:     3,
+		MaxIdle:     100,
 		IdleTimeout: 240 * time.Second,
 
 		Dial: func() (redis.Conn, error) {
@@ -52,6 +50,7 @@ func InitConnect(ip string, port string, password string) {
 			_, err := c.Do("PING")
 			return err
 		},
+		MaxActive:100,
 	}
 
 	go closeConnection()
