@@ -1,3 +1,3 @@
-module Languege/redis_wrapper
+module redis_wrapper
 
 go 1.12
