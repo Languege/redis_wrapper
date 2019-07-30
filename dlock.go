@@ -16,7 +16,7 @@ func TryLock(key string, seconds int)(uniqueID int64, err error) {
 	defer conn.Close()
 
 	uniqueID = time.Now().UnixNano()
-	_, err = conn.Do("SET", key, uniqueID, "EX", seconds, "NX")
+	_, err = redis.String(conn.Do("SET", key, uniqueID, "EX", seconds, "NX"))
 	return
 }
 
