@@ -5,18 +5,10 @@ package redis_wrapper
  *2019/2/22 6:32 PM
  **/
 func FlushAll()(err error){
-	conn := pool.Get()
-	defer conn.Close()
-
-	_, err = conn.Do("FLUSHALL")
-	return
+	return wrapper.FlushAll()
 }
 
 func FlushDB()(err error){
-	conn := pool.Get()
-	defer conn.Close()
-
-	_, err = conn.Do("FLUSHDB")
-	return
+	return wrapper.FlushDB()
 }
 

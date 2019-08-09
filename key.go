@@ -5,20 +5,11 @@ package redis_wrapper
  *2019/2/20 6:00 PM
  **/
 func Del(key string) error {
-	conn := pool.Get()
-	defer conn.Close()
-
-	_, err := conn.Do("DEL", key)
-
-	return err
+	return wrapper.Del(key)
 }
 
 func Expire(key string, seconds int64) error {
-	conn := pool.Get()
-	defer conn.Close()
-
-	_, err := conn.Do("EXPIRE", key, seconds)
-	return err
+	return wrapper.Expire(key, seconds)
 }
 
 /**
@@ -26,9 +17,5 @@ func Expire(key string, seconds int64) error {
  * @param seconds int64 unix时间戳，单位秒
  */
 func ExpireAt(key string, seconds int64) error {
-	conn := pool.Get()
-	defer conn.Close()
-
-	_, err := conn.Do("EXPIREAT", key, seconds)
-	return err
+	return wrapper.ExpireAt(key, seconds)
 }
