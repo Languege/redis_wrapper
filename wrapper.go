@@ -104,12 +104,49 @@ func(self *RedisWrapper) HSet(key,field string, value []byte) (int64, error) {
 	return redis.Int64(conn.Do("HSET", key, field, value))
 }
 
+func(self *RedisWrapper) HMSet(key string, kv map[string]string) (int64, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	params := make([]interface{}, 0, 2 * len(kv)+1)
+	params = append(params, key)
+	for k, v := range kv  {
+		params = append(params, k, v)
+	}
+
+	return redis.Int64(conn.Do("HMSET",  params...))
+}
+
 func(self *RedisWrapper) HGet(key,field string) ([]byte, error) {
 	conn := self.Get()
 	defer conn.Close()
 
 	return  redis.Bytes(conn.Do("HGET", key, field))
 }
+
+func(self *RedisWrapper) HMGet(key string, fields []string) (map[string]string, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	params := make([]interface{}, 0, len(fields)+1)
+	params = append(params, key)
+	for _, v := range fields {
+		params = append(params, v)
+	}
+
+	values, err := redis.Strings(conn.Do("HMGET",  params...))
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]string, len(fields))
+	for i := 0; i < len(fields);i++ {
+		result[fields[i]] = values[i]
+	}
+
+	return result, nil
+}
+
 
 //data = 1存在，data = 0不存在
 func(self *RedisWrapper) HExist(key, field string)(int64, error) {
@@ -378,6 +415,14 @@ func(self *RedisWrapper) ZRevRank(key string, member interface{})(index int64, e
 	defer conn.Close()
 
 	index, err = redis.Int64(conn.Do("ZREVRANK", key, member))
+	return
+}
+
+func(self *RedisWrapper) ZScore(key string, member interface{})(score float64, err error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	score, err = redis.Float64(conn.Do("ZSCORE", key, member))
 	return
 }
 

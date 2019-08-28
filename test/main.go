@@ -1,10 +1,8 @@
 package main
 
 import (
-	"Languege/redis_wrapper"
+	"github.com/Languege/redis_wrapper"
 	"fmt"
-	"go-common/app/common/openplatform/encoding"
-	"strconv"
 )
 
 /**
@@ -15,14 +13,14 @@ func main(){
 
 	redis_wrapper.InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
 
-	var err error
-	values, err := redis_wrapper.ZRangeByScore("zset_test", 0.0, 2.1, true, 0,0)
-
-	fmt.Println(values,err)
-
-	for k, v := range values {
-		fmt.Println(k, string(v.([]byte)))
-	}
+	//var err error
+	//values, err := redis_wrapper.ZRangeByScore("zset_test", 0.0, 2.1, true, 0,0)
+	//
+	//fmt.Println(values,err)
+	//
+	//for k, v := range values {
+	//	fmt.Println(k, string(v.([]byte)))
+	//}
 
 	//uniqueID, err := redis_wrapper.TryLock("dlock", 1000)
 	//time.Sleep(time.Duration(1) * time.Minute)
@@ -60,14 +58,29 @@ func main(){
 	//	}
 	//}
 
-	for i := 0; i< 10;i++ {
-		redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte(encoding.JSON("field" + strconv.Itoa(i))))
-	}
+	//for i := 0; i< 10;i++ {
+	//	redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte(encoding.JSON("field" + strconv.Itoa(i))))
+	//}
+	//
+	//values, err = redis_wrapper.HGetAll("hashtable")
+	//if err == nil {
+	//	for i := 0; i < len(values); i+=2  {
+	//		fmt.Println(string(values[i].([]byte)), string(values[i+1].([]byte)))
+	//	}
+	//}
 
-	values, err = redis_wrapper.HGetAll("hashtable")
-	if err == nil {
-		for i := 0; i < len(values); i+=2  {
-			fmt.Println(string(values[i].([]byte)), string(values[i+1].([]byte)))
-		}
-	}
+	//HMSet, HMGet
+	redis_wrapper.HMSet("hmset_test", map[string]string{"f1":"v1","f2":"v2"})
+	result, err := redis_wrapper.HMGet("hmset_test", []string{"f1","f2"})
+	fmt.Println(result)
+	fmt.Println(err)
+
+
+	redis_wrapper.ZAdd("zadd_test", 1.1, 1000)
+
+	score, err := redis_wrapper.ZScore("zadd_test", 1000)
+
+	fmt.Println(score)
+	fmt.Println(err)
+
 }

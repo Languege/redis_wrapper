@@ -47,3 +47,7 @@ func ZRank(key string, member interface{})(index int64, err error) {
 func ZRevRank(key string, member interface{})(index int64, err error) {
 	return wrapper.ZRevRank(key, member)
 }
+
+func ZScore(key string, member interface{})(score float64, err error) {
+	return wrapper.ZScore(key, member)
+}

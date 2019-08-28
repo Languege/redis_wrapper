@@ -24,3 +24,11 @@ func HDel(key, field string) error {
 func HGetAll(key string)(values []interface{}, err error){
 	return wrapper.HGetAll(key)
 }
+
+func HMSet(key string, kv map[string]string) (int64, error) {
+	return wrapper.HMSet(key,  kv)
+}
+
+func HMGet(key string,fields []string) (map[string]string, error) {
+	return wrapper.HMGet(key, fields)
+}
