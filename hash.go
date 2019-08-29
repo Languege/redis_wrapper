@@ -25,7 +25,7 @@ func HGetAll(key string)(values []interface{}, err error){
 	return wrapper.HGetAll(key)
 }
 
-func HMSet(key string, kv map[string]string) (int64, error) {
+func HMSet(key string, kv map[string]string) (string, error) {
 	return wrapper.HMSet(key,  kv)
 }
 

@@ -104,7 +104,7 @@ func(self *RedisWrapper) HSet(key,field string, value []byte) (int64, error) {
 	return redis.Int64(conn.Do("HSET", key, field, value))
 }
 
-func(self *RedisWrapper) HMSet(key string, kv map[string]string) (int64, error) {
+func(self *RedisWrapper) HMSet(key string, kv map[string]string) (string, error) {
 	conn := self.Get()
 	defer conn.Close()
 
@@ -114,7 +114,7 @@ func(self *RedisWrapper) HMSet(key string, kv map[string]string) (int64, error) 
 		params = append(params, k, v)
 	}
 
-	return redis.Int64(conn.Do("HMSET",  params...))
+	return redis.String(conn.Do("HMSET",  params...))
 }
 
 func(self *RedisWrapper) HGet(key,field string) ([]byte, error) {

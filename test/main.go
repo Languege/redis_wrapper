@@ -70,7 +70,9 @@ func main(){
 	//}
 
 	//HMSet, HMGet
-	redis_wrapper.HMSet("hmset_test", map[string]string{"f1":"v1","f2":"v2"})
+	n, err := redis_wrapper.HMSet("hmset_test", map[string]string{"f1":"v1","f2":"v2"})
+	fmt.Println(n)
+	fmt.Println(err)
 	result, err := redis_wrapper.HMGet("hmset_test", []string{"f1","f2"})
 	fmt.Println(result)
 	fmt.Println(err)
