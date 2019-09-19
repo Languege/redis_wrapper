@@ -118,7 +118,7 @@ func(self *RedisWrapper) HMSet(key string, kv map[string]string) (string, error)
 	defer conn.Close()
 
 	params := make([]interface{}, 0, 2 * len(kv)+1)
-	params = append(params, key)
+	params = append(params, self.buildKey(key))
 	for k, v := range kv  {
 		params = append(params, k, v)
 	}
@@ -138,7 +138,7 @@ func(self *RedisWrapper) HMGet(key string, fields []string) (map[string]string, 
 	defer conn.Close()
 
 	params := make([]interface{}, 0, len(fields)+1)
-	params = append(params, key)
+	params = append(params, self.buildKey(key))
 	for _, v := range fields {
 		params = append(params, v)
 	}
@@ -180,7 +180,7 @@ func(self *RedisWrapper) HGetAll(key string)(values []interface{}, err error){
 	conn := self.Get()
 	defer conn.Close()
 
-	values, err = redis.Values(conn.Do("HGETALL", key))
+	values, err = redis.Values(conn.Do("HGETALL", self.buildKey(key)))
 	return
 }
 
@@ -189,7 +189,7 @@ func(self *RedisWrapper) Del(key string) error {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("DEL", key)
+	_, err := conn.Do("DEL", self.buildKey(key))
 
 	return err
 }
@@ -229,7 +229,7 @@ func(self *RedisWrapper)  RPop(key string) ([]byte, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return  redis.Bytes(conn.Do("RPOP", key))
+	return  redis.Bytes(conn.Do("RPOP", self.buildKey(key)))
 }
 
 func(self *RedisWrapper)  FlushAll()(err error){
@@ -269,7 +269,7 @@ func(self *RedisWrapper) SCard(key string)(size int, err error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	size, err = redis.Int(conn.Do("SREM", key))
+	size, err = redis.Int(conn.Do("SREM", self.buildKey(key)))
 	return
 }
 
@@ -277,7 +277,7 @@ func(self *RedisWrapper) SPop(key string)(value interface{}, err error){
 	conn := self.Get()
 	defer conn.Close()
 
-	value, err = redis.Int(conn.Do("SPOP", key))
+	value, err = redis.Int(conn.Do("SPOP", self.buildKey(key)))
 	return
 }
 
@@ -285,7 +285,7 @@ func(self *RedisWrapper) SMembers(key string)(values []interface{}, err error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	values, err = redis.Values(conn.Do("SMEMBERS", key))
+	values, err = redis.Values(conn.Do("SMEMBERS", self.buildKey(key)))
 	return
 }
 
@@ -319,7 +319,7 @@ func(self *RedisWrapper) ZCard(key string) (size int64, err error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return redis.Int64(conn.Do("ZCard", key))
+	return redis.Int64(conn.Do("ZCard", self.buildKey(key)))
 }
 
 
@@ -441,7 +441,7 @@ func(self *RedisWrapper) SGet(key string) ([]byte, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return  redis.Bytes(conn.Do("GET", key))
+	return  redis.Bytes(conn.Do("GET", self.buildKey(key)))
 }
 
 func(self *RedisWrapper) SSet(key string, value []byte, ex int, px int, nx bool, xx bool) error {
@@ -483,5 +483,12 @@ func(self *RedisWrapper) Incr(key string) (int64, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return redis.Int64(conn.Do("INCR", key))
+	return redis.Int64(conn.Do("INCR", self.buildKey(key)))
+}
+
+func(self *RedisWrapper) Exist(key string) (bool, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	return redis.Bool(conn.Do("EXISTS", self.buildKey(key)))
 }

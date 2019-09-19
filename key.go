@@ -19,3 +19,7 @@ func Expire(key string, seconds int64) error {
 func ExpireAt(key string, seconds int64) error {
 	return wrapper.ExpireAt(key, seconds)
 }
+
+func Exist(key string) (bool, error) {
+	return wrapper.Exist(key)
+}

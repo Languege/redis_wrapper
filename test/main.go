@@ -85,4 +85,9 @@ func main(){
 	fmt.Println(score)
 	fmt.Println(err)
 
+
+	ret, err := redis_wrapper.Exist("zadd_test1")
+	fmt.Println(ret)
+	fmt.Println(err)
+
 }
