@@ -11,7 +11,7 @@ import (
  **/
 func main(){
 
-	redis_wrapper.InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	redis_wrapper.InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", "server_0001")
 
 	//var err error
 	//values, err := redis_wrapper.ZRangeByScore("zset_test", 0.0, 2.1, true, 0,0)

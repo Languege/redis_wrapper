@@ -14,12 +14,18 @@ var(
 )
 
 
-func InitConnect(ip string, port string, password string) {
+func InitConnect(ip, port, password string, options... interface{}) {
 	if wrapper != nil {
 		return
 	}
 
 	wrapper = NewRedisWrapper(ip, port, password, 100, time.Duration(240) * time.Second, 200)
+	if len(options) > 0 {
+		prefix, ok := options[0].(string)
+		if ok {
+			wrapper.Prefix = prefix
+		}
+	}
 }
 
 

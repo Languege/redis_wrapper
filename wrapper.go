@@ -14,13 +14,14 @@ import (
  **/
 type RedisWrapper struct {
 	redis.Pool
+	Prefix 		string	//key前缀
 }
 
 func NewRedisWrapper(ip string, port string, password string, maxIdle int, idleTimeout time.Duration, maxActive int) *RedisWrapper{
 	addr := ip + ":" + port
 
 	w  :=  &RedisWrapper{
-		redis.Pool{
+		Pool:redis.Pool{
 			MaxIdle:     maxIdle,
 			IdleTimeout: idleTimeout,
 
@@ -54,6 +55,14 @@ func NewRedisWrapper(ip string, port string, password string, maxIdle int, idleT
 	return w
 }
 
+func(self *RedisWrapper) buildKey(key string) string {
+	if self.Prefix != "" {
+		key = self.Prefix + string(os.PathListSeparator) + key
+	}
+
+	return key
+}
+
 func(self *RedisWrapper) closeConnection() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -75,7 +84,7 @@ func(self *RedisWrapper) TryLock(key string, seconds int)(uniqueID int64, err er
 	defer conn.Close()
 
 	uniqueID = time.Now().UnixNano()
-	_, err = redis.String(conn.Do("SET", key, uniqueID, "EX", seconds, "NX"))
+	_, err = redis.String(conn.Do("SET", self.buildKey(key), uniqueID, "EX", seconds, "NX"))
 	return
 }
 
@@ -92,7 +101,7 @@ func(self *RedisWrapper) Release(key string, uniqueID int64)(err error) {
       end
 	`)
 
-	_, err = script.Do(conn, key, uniqueID)
+	_, err = script.Do(conn, self.buildKey(key), uniqueID)
 
 	return
 }
@@ -101,7 +110,7 @@ func(self *RedisWrapper) HSet(key,field string, value []byte) (int64, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return redis.Int64(conn.Do("HSET", key, field, value))
+	return redis.Int64(conn.Do("HSET", self.buildKey(key), field, value))
 }
 
 func(self *RedisWrapper) HMSet(key string, kv map[string]string) (string, error) {
@@ -121,7 +130,7 @@ func(self *RedisWrapper) HGet(key,field string) ([]byte, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return  redis.Bytes(conn.Do("HGET", key, field))
+	return  redis.Bytes(conn.Do("HGET", self.buildKey(key), field))
 }
 
 func(self *RedisWrapper) HMGet(key string, fields []string) (map[string]string, error) {
@@ -153,7 +162,7 @@ func(self *RedisWrapper) HExist(key, field string)(int64, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	data, err := redis.Int64(conn.Do("HEXISTS", key, field))
+	data, err := redis.Int64(conn.Do("HEXISTS", self.buildKey(key), field))
 
 	return data, err
 }
@@ -162,7 +171,7 @@ func(self *RedisWrapper) HDel(key, field string) error {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("HDEL", key, field)
+	_, err := conn.Do("HDEL", self.buildKey(key), field)
 
 	return err
 }
@@ -189,7 +198,7 @@ func(self *RedisWrapper) Expire(key string, seconds int64) error {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("EXPIRE", key, seconds)
+	_, err := conn.Do("EXPIRE", self.buildKey(key), seconds)
 	return err
 }
 
@@ -201,7 +210,7 @@ func(self *RedisWrapper) ExpireAt(key string, seconds int64) error {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("EXPIREAT", key, seconds)
+	_, err := conn.Do("EXPIREAT", self.buildKey(key), seconds)
 	return err
 }
 
@@ -210,7 +219,7 @@ func(self *RedisWrapper) LPush(key string, value []byte) error {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("LPUSH", key, value)
+	_, err := conn.Do("LPUSH", self.buildKey(key), value)
 
 	return err
 }
@@ -244,7 +253,7 @@ func(self *RedisWrapper) SAdd(key string, member interface{}) (err error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err = conn.Do("SADD", key, member)
+	_, err = conn.Do("SADD", self.buildKey(key), member)
 	return
 }
 
@@ -252,7 +261,7 @@ func(self *RedisWrapper) SRem(key string, member interface{})(err error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err = conn.Do("SREM", key, member)
+	_, err = conn.Do("SREM", self.buildKey(key), member)
 	return
 }
 
@@ -284,7 +293,7 @@ func(self *RedisWrapper) SRandMember(key string, count int)(values []interface{}
 	conn := self.Get()
 	defer conn.Close()
 
-	values, err = redis.Values(conn.Do("SRANDMEMBER", key, count))
+	values, err = redis.Values(conn.Do("SRANDMEMBER", self.buildKey(key), count))
 	return
 }
 
@@ -292,7 +301,7 @@ func(self *RedisWrapper) SIsMember(key string, member interface{})(value bool, e
 	conn := self.Get()
 	defer conn.Close()
 
-	value, err = redis.Bool(conn.Do("SISMEMBER", key, member))
+	value, err = redis.Bool(conn.Do("SISMEMBER", self.buildKey(key), member))
 	return
 }
 
@@ -302,7 +311,7 @@ func(self *RedisWrapper) ZAdd(key string, score float64, value interface{})  err
 	defer conn.Close()
 
 	var err error
-	_, err = conn.Do("ZADD", key, score, value)
+	_, err = conn.Do("ZADD", self.buildKey(key), score, value)
 	return err
 }
 
@@ -321,15 +330,15 @@ func(self *RedisWrapper) ZRangeByScore(key string, min float64, max float64, wit
 
 	if withScores {
 		if count > 0 {
-			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", key, min, max, "WITHSCORES", "LIMIT", offset, count))
+			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", self.buildKey(key), min, max, "WITHSCORES", "LIMIT", offset, count))
 		}else{
-			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", key, min, max, "WITHSCORES"))
+			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", self.buildKey(key), min, max, "WITHSCORES"))
 		}
 	}else{
 		if count > 0 {
-			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", key, min, max, "LIMIT", offset, count))
+			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", self.buildKey(key), min, max, "LIMIT", offset, count))
 		}else{
-			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", key, min, max))
+			values, err = redis.Values(conn.Do("ZRANGEBYSCORE", self.buildKey(key), min, max))
 		}
 	}
 
@@ -343,15 +352,15 @@ func(self *RedisWrapper) ZRevRangeByScore(key string, min float64, max float64, 
 
 	if withScores {
 		if count > 0 {
-			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", key, min, max, "WITHSCORES", "LIMIT", offset, count))
+			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", self.buildKey(key), min, max, "WITHSCORES", "LIMIT", offset, count))
 		}else{
-			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", key, min, max, "WITHSCORES"))
+			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", self.buildKey(key), min, max, "WITHSCORES"))
 		}
 	}else{
 		if count > 0 {
-			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", key, min, max, "LIMIT", offset, count))
+			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", self.buildKey(key), min, max, "LIMIT", offset, count))
 		}else{
-			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", key, min, max))
+			values, err = redis.Values(conn.Do("ZREVRANGEBYSCORE", self.buildKey(key), min, max))
 		}
 	}
 
@@ -364,9 +373,9 @@ func(self *RedisWrapper) ZRange(key string, start int, stop int, withScores bool
 	defer conn.Close()
 
 	if withScores {
-		values, err = redis.Values(conn.Do("ZRANGE", key, start, stop, "WITHSCORES"))
+		values, err = redis.Values(conn.Do("ZRANGE", self.buildKey(key), start, stop, "WITHSCORES"))
 	}else{
-		values, err = redis.Values(conn.Do("ZRANGE", key, start, stop))
+		values, err = redis.Values(conn.Do("ZRANGE", self.buildKey(key), start, stop))
 	}
 
 	return
@@ -377,9 +386,9 @@ func(self *RedisWrapper) ZRevRange(key string, start int, stop int, withScores b
 	defer conn.Close()
 
 	if withScores {
-		values, err = redis.Values(conn.Do("ZREVRANGE", key, start, stop, "WITHSCORES"))
+		values, err = redis.Values(conn.Do("ZREVRANGE", self.buildKey(key), start, stop, "WITHSCORES"))
 	}else{
-		values, err = redis.Values(conn.Do("ZREVRANGE", key, start, stop))
+		values, err = redis.Values(conn.Do("ZREVRANGE", self.buildKey(key), start, stop))
 	}
 
 	return
@@ -389,7 +398,7 @@ func(self *RedisWrapper) ZIncreBy(key string, increment float64, member interfac
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err = conn.Do("ZINCRBY", key, increment, member)
+	_, err = conn.Do("ZINCRBY", self.buildKey(key), increment, member)
 	return
 }
 
@@ -398,7 +407,7 @@ func(self *RedisWrapper) ZRem(key string, member interface{})(err error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	_, err = conn.Do("ZREM", key, member)
+	_, err = conn.Do("ZREM", self.buildKey(key), member)
 	return
 }
 
@@ -406,7 +415,7 @@ func(self *RedisWrapper) ZRank(key string, member interface{})(index int64, err 
 	conn := self.Get()
 	defer conn.Close()
 
-	index, err = redis.Int64(conn.Do("ZRANK", key, member))
+	index, err = redis.Int64(conn.Do("ZRANK", self.buildKey(key), member))
 	return
 }
 
@@ -414,7 +423,7 @@ func(self *RedisWrapper) ZRevRank(key string, member interface{})(index int64, e
 	conn := self.Get()
 	defer conn.Close()
 
-	index, err = redis.Int64(conn.Do("ZREVRANK", key, member))
+	index, err = redis.Int64(conn.Do("ZREVRANK", self.buildKey(key), member))
 	return
 }
 
@@ -422,7 +431,7 @@ func(self *RedisWrapper) ZScore(key string, member interface{})(score float64, e
 	conn := self.Get()
 	defer conn.Close()
 
-	score, err = redis.Float64(conn.Do("ZSCORE", key, member))
+	score, err = redis.Float64(conn.Do("ZSCORE", self.buildKey(key), member))
 	return
 }
 
@@ -443,27 +452,27 @@ func(self *RedisWrapper) SSet(key string, value []byte, ex int, px int, nx bool,
 
 	if ex > 0 {
 		if nx {
-			_, err = conn.Do("SET", key, value, "EX", ex, "NX")
+			_, err = conn.Do("SET", self.buildKey(key), value, "EX", ex, "NX")
 		}else if xx {
-			_, err = conn.Do("SET", key, value, "EX", ex, "XX")
+			_, err = conn.Do("SET", self.buildKey(key), value, "EX", ex, "XX")
 		}else{
-			_, err = conn.Do("SET", key, value, "EX", ex)
+			_, err = conn.Do("SET", self.buildKey(key), value, "EX", ex)
 		}
 	}else if px > 0 {
 		if nx {
-			_, err = conn.Do("SET", key, value, "PX", px, "NX")
+			_, err = conn.Do("SET", self.buildKey(key), value, "PX", px, "NX")
 		}else if xx {
-			_, err = conn.Do("SET", key, value, "PX", px, "XX")
+			_, err = conn.Do("SET", self.buildKey(key), value, "PX", px, "XX")
 		}else{
-			_, err = conn.Do("SET", key, value, "PX", px)
+			_, err = conn.Do("SET", self.buildKey(key), value, "PX", px)
 		}
 	}else{
 		if nx {
-			_, err = conn.Do("SET", key, value, "NX")
+			_, err = conn.Do("SET", self.buildKey(key), value, "NX")
 		}else if xx {
-			_, err = conn.Do("SET", key, value, "XX")
+			_, err = conn.Do("SET", self.buildKey(key), value, "XX")
 		}else{
-			_, err = conn.Do("SET", key, value)
+			_, err = conn.Do("SET", self.buildKey(key), value)
 		}
 	}
 
