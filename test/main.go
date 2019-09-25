@@ -77,6 +77,10 @@ func main(){
 	fmt.Println(result)
 	fmt.Println(err)
 
+	size, err := redis_wrapper.HLen("hmset_tes")
+	fmt.Println(size)
+	fmt.Println(err)
+
 
 	redis_wrapper.ZAdd("zadd_test", 1.1, 1000)
 

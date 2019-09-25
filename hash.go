@@ -32,3 +32,7 @@ func HMSet(key string, kv map[string]string) (string, error) {
 func HMGet(key string,fields []string) (map[string]string, error) {
 	return wrapper.HMGet(key, fields)
 }
+
+func HLen(key string) (int, error) {
+	return wrapper.HLen(key)
+}

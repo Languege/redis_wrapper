@@ -185,6 +185,14 @@ func(self *RedisWrapper) HGetAll(key string)(values []interface{}, err error){
 }
 
 
+func(self *RedisWrapper) HLen(key string)(size int, err error){
+	conn := self.Get()
+	defer conn.Close()
+
+	size, err = redis.Int(conn.Do("HLEN", self.buildKey(key)))
+	return
+}
+
 func(self *RedisWrapper) Del(key string) error {
 	conn := self.Get()
 	defer conn.Close()
