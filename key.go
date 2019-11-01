@@ -23,3 +23,7 @@ func ExpireAt(key string, seconds int64) error {
 func Exist(key string) (bool, error) {
 	return wrapper.Exist(key)
 }
+
+func TTL(key string) (int64, error) {
+	return wrapper.TTL(key)
+}

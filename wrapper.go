@@ -500,3 +500,10 @@ func(self *RedisWrapper) Exist(key string) (bool, error) {
 
 	return redis.Bool(conn.Do("EXISTS", self.buildKey(key)))
 }
+
+func(self *RedisWrapper) TTL(key string) (int64, error){
+	conn := self.Get()
+	defer  conn.Close()
+
+	return redis.Int64(conn.Do("TTL", self.buildKey(key)))
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Languege/redis_wrapper"
 	"fmt"
+	"strconv"
 )
 
 /**
@@ -58,40 +59,58 @@ func main(){
 	//	}
 	//}
 
-	//for i := 0; i< 10;i++ {
-	//	redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte(encoding.JSON("field" + strconv.Itoa(i))))
-	//}
-	//
-	//values, err = redis_wrapper.HGetAll("hashtable")
-	//if err == nil {
-	//	for i := 0; i < len(values); i+=2  {
-	//		fmt.Println(string(values[i].([]byte)), string(values[i+1].([]byte)))
-	//	}
-	//}
+	for i := 0; i< 10;i++ {
+		redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte("2122"))
+	}
+
+	values, err := redis_wrapper.HGetAll2Map("hashtable")
+	if err == nil {
+		for k, v := range values {
+			fmt.Printf("key:%s, value:%s \n", k, string(v))
+		}
+
+	}
 
 	//HMSet, HMGet
-	n, err := redis_wrapper.HMSet("hmset_test", map[string]string{"f1":"v1","f2":"v2"})
-	fmt.Println(n)
-	fmt.Println(err)
-	result, err := redis_wrapper.HMGet("hmset_test", []string{"f1","f2"})
-	fmt.Println(result)
-	fmt.Println(err)
+	//n, err := redis_wrapper.HMSet("hmset_test", map[string]string{"f1":"v1","f2":"v2"})
+	//fmt.Println(n)
+	//fmt.Println(err)
+	//result, err := redis_wrapper.HMGet("hmset_test", []string{"f1","f2"})
+	//fmt.Println(result)
+	//fmt.Println(err)
+	//
+	//size, err := redis_wrapper.HLen("hmset_tes")
+	//fmt.Println(size)
+	//fmt.Println(err)
+	//
+	//
+	//redis_wrapper.ZAdd("zadd_test", 1.1, 1000)
+	//
+	//score, err := redis_wrapper.ZScore("zadd_test", 1000)
+	//
+	//fmt.Println(score)
+	//fmt.Println(err)
+	//
+	//
+	//ret, err := redis_wrapper.Exist("zadd_test1")
+	//fmt.Println(ret)
+	//fmt.Println(err)
 
-	size, err := redis_wrapper.HLen("hmset_tes")
-	fmt.Println(size)
-	fmt.Println(err)
 
-
-	redis_wrapper.ZAdd("zadd_test", 1.1, 1000)
-
-	score, err := redis_wrapper.ZScore("zadd_test", 1000)
-
-	fmt.Println(score)
-	fmt.Println(err)
-
-
-	ret, err := redis_wrapper.Exist("zadd_test1")
-	fmt.Println(ret)
-	fmt.Println(err)
+	//生命周期检测
+	//r1, err := redis_wrapper.TTL("no_exist_ttl_test")
+	//fmt.Println(r1)
+	//fmt.Println(err)
+	//
+	//redis_wrapper.Set("exist_no_ttl_test", []byte("exist_no_ttl_test"), 0, 0, false, false)
+	//r2, err := redis_wrapper.TTL("exist_no_ttl_test")
+	//fmt.Println(r2)
+	//fmt.Println(err)
+	//
+	//redis_wrapper.Set("exist_ttl_test", []byte("exist_ttl_test"), 100, 0, false, false)
+	//time.Sleep(time.Duration(10) * time.Second)
+	//r3, err := redis_wrapper.TTL("exist_ttl_test")
+	//fmt.Println(r3)
+	//fmt.Println(err)
 
 }
