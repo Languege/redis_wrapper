@@ -38,22 +38,5 @@ func HLen(key string) (int, error) {
 }
 
 func HGetAll2Map(key string)(ret map[string][]byte, err error){
-	ret = map[string][]byte{}
-	var values []interface{}
-	values, err =  wrapper.HGetAll(key)
-	if err != nil {
-		return
-	}
-
-	if len(values) == 0 {
-		return
-	}
-
-	for i := 0; i < len(values); i += 2 {
-		key := string(values[i].([]byte))
-		data := values[i+1].([]byte)
-
-		ret[key] = data
-	}
-	return
+	return wrapper.HGetAll2Map(key)
 }
