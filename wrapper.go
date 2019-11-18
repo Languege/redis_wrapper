@@ -187,7 +187,7 @@ func(self *RedisWrapper) HGetAll(key string)(values []interface{}, err error){
 func(self *RedisWrapper) HGetAll2Map(key string)(ret map[string][]byte, err error) {
 	ret = map[string][]byte{}
 	var values []interface{}
-	values, err =  wrapper.HGetAll(key)
+	values, err =  self.HGetAll(key)
 	if err != nil {
 		return
 	}
