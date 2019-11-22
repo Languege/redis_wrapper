@@ -8,6 +8,18 @@ func LPush(key string, value []byte) error {
 	return wrapper.LPush(key, value)
 }
 
+func RPush(key string, value []byte) error {
+	return wrapper.RPush(key, value)
+}
+
 func RPop(key string) ([]byte, error) {
 	return wrapper.RPop(key)
+}
+
+func LPop(key string) ([]byte, error) {
+	return wrapper.LPop(key)
+}
+
+func LRange(key string, start, stop int)(ret []string, err error) {
+	return wrapper.LRange(key, start, stop)
 }

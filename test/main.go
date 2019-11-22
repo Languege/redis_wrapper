@@ -59,17 +59,17 @@ func main(){
 	//	}
 	//}
 
-	for i := 0; i< 10;i++ {
-		redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte("2122"))
-	}
-
-	values, err := redis_wrapper.HGetAll2Map("hashtable")
-	if err == nil {
-		for k, v := range values {
-			fmt.Printf("key:%s, value:%s \n", k, string(v))
-		}
-
-	}
+	//for i := 0; i< 10;i++ {
+	//	redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte("2122"))
+	//}
+	//
+	//values, err := redis_wrapper.HGetAll2Map("hashtable")
+	//if err == nil {
+	//	for k, v := range values {
+	//		fmt.Printf("key:%s, value:%s \n", k, string(v))
+	//	}
+	//
+	//}
 
 	//HMSet, HMGet
 	//n, err := redis_wrapper.HMSet("hmset_test", map[string]string{"f1":"v1","f2":"v2"})
@@ -112,5 +112,14 @@ func main(){
 	//r3, err := redis_wrapper.TTL("exist_ttl_test")
 	//fmt.Println(r3)
 	//fmt.Println(err)
+
+	lkey := "lrangekey"
+	for i := 0; i< 10;i++ {
+		redis_wrapper.RPush(lkey, []byte("field" + strconv.Itoa(i)))
+	}
+
+	ret, err := redis_wrapper.LRange(lkey, 0, -1)
+	fmt.Println(ret)
+	fmt.Println(err)
 
 }

@@ -253,12 +253,36 @@ func(self *RedisWrapper) LPush(key string, value []byte) error {
 	return err
 }
 
+func(self *RedisWrapper) RPush(key string, value []byte) error {
+	conn := self.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("RPUSH", self.buildKey(key), value)
+
+	return err
+}
+
 func(self *RedisWrapper)  RPop(key string) ([]byte, error) {
 
 	conn := self.Get()
 	defer conn.Close()
 
 	return  redis.Bytes(conn.Do("RPOP", self.buildKey(key)))
+}
+
+func(self *RedisWrapper)  LPop(key string) ([]byte, error) {
+
+	conn := self.Get()
+	defer conn.Close()
+
+	return  redis.Bytes(conn.Do("LPOP", self.buildKey(key)))
+}
+
+func(self *RedisWrapper) LRange(key string, start, stop int)(ret []string, err error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	return redis.Strings(conn.Do("LRANGE", self.buildKey(key), start, stop))
 }
 
 func(self *RedisWrapper)  FlushAll()(err error){
