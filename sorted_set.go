@@ -51,3 +51,7 @@ func ZRevRank(key string, member interface{})(index int64, err error) {
 func ZScore(key string, member interface{})(score float64, err error) {
 	return wrapper.ZScore(key, member)
 }
+
+func ZRemRangeByScore(key string, min, max float64)(num int, err error) {
+	return wrapper.ZRemRangeByScore(key, min, max)
+}

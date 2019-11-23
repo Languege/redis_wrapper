@@ -113,13 +113,23 @@ func main(){
 	//fmt.Println(r3)
 	//fmt.Println(err)
 
-	lkey := "lrangekey"
+	//lkey := "lrangekey"
+	//for i := 0; i< 10;i++ {
+	//	redis_wrapper.RPush(lkey, []byte("field" + strconv.Itoa(i)))
+	//}
+	//
+	//ret, err := redis_wrapper.LRange(lkey, 0, -1)
+	//fmt.Println(ret)
+	//fmt.Println(err)
+
+	lkey := "zset_test"
 	for i := 0; i< 10;i++ {
-		redis_wrapper.RPush(lkey, []byte("field" + strconv.Itoa(i)))
+		redis_wrapper.ZAdd(lkey, float64(i), []byte("field" + strconv.Itoa(i)))
 	}
 
-	ret, err := redis_wrapper.LRange(lkey, 0, -1)
+	ret, err := redis_wrapper.ZRemRangeByScore(lkey, 0, 99999)
 	fmt.Println(ret)
 	fmt.Println(err)
+
 
 }

@@ -488,6 +488,14 @@ func(self *RedisWrapper) ZScore(key string, member interface{})(score float64, e
 	return
 }
 
+func(self *RedisWrapper) ZRemRangeByScore(key string, min, max float64)(num int, err error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	num, err = redis.Int(conn.Do("ZREMRANGEBYSCORE", self.buildKey(key), min, max))
+	return
+}
+
 
 func(self *RedisWrapper) SGet(key string) ([]byte, error) {
 
