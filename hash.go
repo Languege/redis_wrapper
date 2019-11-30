@@ -40,3 +40,7 @@ func HLen(key string) (int, error) {
 func HGetAll2Map(key string)(ret map[string][]byte, err error){
 	return wrapper.HGetAll2Map(key)
 }
+
+func HIncrBy(key, field string, increment int64)(ret int64, err error){
+	return wrapper.HIncrBy(key, field, increment)
+}

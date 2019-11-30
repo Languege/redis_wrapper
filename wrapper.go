@@ -214,6 +214,17 @@ func(self *RedisWrapper) HLen(key string)(size int, err error){
 	return
 }
 
+
+func(self *RedisWrapper) HIncrBy(key, field string, increment int64)(ret int64, err error){
+	conn := self.Get()
+	defer conn.Close()
+
+	ret, err = redis.Int64(conn.Do("HINCRBY", self.buildKey(key), field, increment))
+	return
+}
+
+
+
 func(self *RedisWrapper) Del(key string) error {
 	conn := self.Get()
 	defer conn.Close()

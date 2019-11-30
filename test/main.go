@@ -131,5 +131,19 @@ func main(){
 	fmt.Println(ret)
 	fmt.Println(err)
 
+	redis_wrapper.Set("string_test", []byte("1"), 0, 0, false, false)
+	tmp, err := redis_wrapper.Get("string_test")
+	fmt.Println(tmp)
+	fmt.Println(err)
+
+
+	ret, err = strconv.Atoi(string(tmp))
+	fmt.Println(ret)
+	fmt.Println(err)
+
+
+	ret2, err2 := redis_wrapper.HIncrBy("hash_test", "1", 1)
+	fmt.Println(ret2)
+	fmt.Println(err2)
 
 }
