@@ -44,3 +44,12 @@ func HGetAll2Map(key string)(ret map[string][]byte, err error){
 func HIncrBy(key, field string, increment int64)(ret int64, err error){
 	return wrapper.HIncrBy(key, field, increment)
 }
+
+
+func HGetInt64(key,field string) (int64, error) {
+	return wrapper.HGetInt64(key, field)
+}
+
+func HGetString(key,field string) (string, error) {
+	return wrapper.HGetString(key, field)
+}

@@ -133,6 +133,20 @@ func(self *RedisWrapper) HGet(key,field string) ([]byte, error) {
 	return  redis.Bytes(conn.Do("HGET", self.buildKey(key), field))
 }
 
+func(self *RedisWrapper) HGetInt64(key,field string) (int64, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	return  redis.Int64(conn.Do("HGET", self.buildKey(key), field))
+}
+
+func(self *RedisWrapper) HGetString(key,field string) (string, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	return  redis.String(conn.Do("HGET", self.buildKey(key), field))
+}
+
 func(self *RedisWrapper) HMGet(key string, fields []string) (map[string]string, error) {
 	conn := self.Get()
 	defer conn.Close()
@@ -516,7 +530,51 @@ func(self *RedisWrapper) SGet(key string) ([]byte, error) {
 	return  redis.Bytes(conn.Do("GET", self.buildKey(key)))
 }
 
+func(self *RedisWrapper) SGetInt64(key string) (int64, error) {
+
+	conn := self.Get()
+	defer conn.Close()
+
+	return  redis.Int64(conn.Do("GET", self.buildKey(key)))
+}
+
+func(self *RedisWrapper) SGetString(key string) (string, error) {
+
+	conn := self.Get()
+	defer conn.Close()
+
+	return  redis.String(conn.Do("GET", self.buildKey(key)))
+}
+
 func(self *RedisWrapper) SSet(key string, value []byte, ex int, px int, nx bool, xx bool) error {
+	return self.SSetValue(key, value, ex, px, nx, xx)
+}
+
+func(self *RedisWrapper) SSetValue(key string, value interface{}, options... interface{}) error {
+	var(
+		ex, px int
+		nx, xx bool
+	)
+	if len(options) > 0 {
+		if v, ok := options[0].(int);ok {
+			ex = v
+		}
+	}
+	if len(options) > 1 {
+		if v, ok := options[1].(int);ok {
+			px = v
+		}
+	}
+	if len(options) > 2 {
+		if v, ok := options[2].(bool);ok {
+			nx = v
+		}
+	}
+	if len(options) > 3 {
+		if v, ok := options[3].(bool);ok {
+			xx = v
+		}
+	}
 	conn := self.Get()
 	defer conn.Close()
 
@@ -550,6 +608,8 @@ func(self *RedisWrapper) SSet(key string, value []byte, ex int, px int, nx bool,
 
 	return err
 }
+
+
 
 func(self *RedisWrapper) Incr(key string) (int64, error) {
 	conn := self.Get()

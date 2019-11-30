@@ -146,4 +146,16 @@ func main(){
 	fmt.Println(ret2)
 	fmt.Println(err2)
 
+
+	ret3, err3 := redis_wrapper.HGetInt64("hash_test", "1")
+	fmt.Println(ret3)
+	fmt.Println(err3)
+
+
+	redis_wrapper.SetValue("test_string", 100)
+	ret4, err4 := redis_wrapper.GetInt64("test_string")
+	fmt.Println(ret4)
+	fmt.Println(err4)
+
+
 }
