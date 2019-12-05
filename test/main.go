@@ -59,9 +59,9 @@ func main(){
 	//	}
 	//}
 
-	//for i := 0; i< 10;i++ {
-	//	redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte("2122"))
-	//}
+	for i := 0; i< 500;i++ {
+		redis_wrapper.HSet("hashtable", "field" + strconv.Itoa(i), []byte("2122"))
+	}
 	//
 	//values, err := redis_wrapper.HGetAll2Map("hashtable")
 	//if err == nil {

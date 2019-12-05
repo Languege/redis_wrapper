@@ -3,6 +3,8 @@ package redis_wrapper
 import (
 	"testing"
 	"strconv"
+	"fmt"
+	"encoding/json"
 )
 
 
@@ -44,6 +46,29 @@ func BenchmarkRedis_HSet(b *testing.B) {
 			b.Fatal(err)
 		}
 	}
+}
+
+func BenchmarkRedisWrapper_HGetAll(b *testing.B) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	OpenTrace(10)
+
+	for i := 0; i< 500;i++ {
+		HSet("hashkey", "field" + strconv.Itoa(i), []byte("2122"))
+	}
+	var(
+		err error
+	)
+	for i := 0; i < b.N ; i++  {
+		_, err = HGetAll("hashkey")
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+
+
+	data, _ := json.Marshal(StatTraceInfo())
+
+	fmt.Printf("%+v \n", string(data))
 }
 
 func BenchmarkSRandMember(b *testing.B) {
