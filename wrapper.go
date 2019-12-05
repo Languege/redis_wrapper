@@ -26,6 +26,8 @@ type CommandTrace struct {
 	TotalNum		int64
 	TotalMs			int64
 	AvgMsPerOp		int64
+	MaxStatNum		int64	//最大统计次数，避免数据不能反映最近状况
+	ResetNum		int64	//因超出统计数次而重置次数
 }
 
 func NewRedisWrapper(ip string, port string, password string, maxIdle int, idleTimeout time.Duration, maxActive int) *RedisWrapper{
@@ -82,8 +84,15 @@ func(self *RedisWrapper) Stat(command string, startTime time.Time) {
 			//0~self.TracePercentage
 			self.mutex.Lock()
 			if v, ok := self.TraceList[command];ok {
-				v.TotalNum++
-				v.TotalMs += time.Now().Sub(startTime).Microseconds()
+				if v.TotalNum >= v.MaxStatNum {
+					v.TotalNum = 1
+					v.TotalMs = time.Now().Sub(startTime).Microseconds()
+					v.ResetNum++
+				}else{
+					v.TotalNum++
+					v.TotalMs += time.Now().Sub(startTime).Microseconds()
+				}
+
 			}else{
 				self.TraceList[command] = &CommandTrace{TotalNum:1,TotalMs:time.Now().Sub(startTime).Microseconds()}
 			}
