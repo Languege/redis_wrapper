@@ -10,6 +10,9 @@ import (
 	"sync"
 )
 
+const(
+	Default_MaxStatNum = 1000
+)
 /**
  *@author LanguageY++2013
  *2019/8/9 9:12 PM
@@ -20,13 +23,13 @@ type RedisWrapper struct {
 	TracePercentage	int	//采集概率百分比
 	TraceList		map[string]*CommandTrace //命令统计
 	mutex 			sync.RWMutex	//统计锁
+	MaxStatNum		int64	//最大统计次数，避免数据不能反映最近状况
 }
 
 type CommandTrace struct {
 	TotalNum		int64
 	TotalMs			int64
 	AvgMsPerOp		int64
-	MaxStatNum		int64	//最大统计次数，避免数据不能反映最近状况
 	ResetNum		int64	//因超出统计数次而重置次数
 }
 
@@ -69,8 +72,18 @@ func NewRedisWrapper(ip string, port string, password string, maxIdle int, idleT
 }
 
 //开启追踪
-func(self *RedisWrapper) OpenTrace(tracePercentage int) {
+func(self *RedisWrapper) OpenTrace(tracePercentage int, options... interface{}) {
 	self.TracePercentage = tracePercentage
+	if len(options) > 0 {
+		if v, ok := options[0].(int);ok {
+			self.MaxStatNum = int64(v)
+		}
+	}
+
+	if self.MaxStatNum <= 0 {
+		self.MaxStatNum = Default_MaxStatNum
+	}
+
 
 	self.mutex.Lock()
 	self.TraceList = map[string]*CommandTrace{}
@@ -84,7 +97,7 @@ func(self *RedisWrapper) Stat(command string, startTime time.Time) {
 			//0~self.TracePercentage
 			self.mutex.Lock()
 			if v, ok := self.TraceList[command];ok {
-				if v.TotalNum >= v.MaxStatNum {
+				if v.TotalNum >= self.MaxStatNum {
 					v.TotalNum = 1
 					v.TotalMs = time.Now().Sub(startTime).Microseconds()
 					v.ResetNum++

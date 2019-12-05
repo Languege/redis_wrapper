@@ -50,7 +50,7 @@ func BenchmarkRedis_HSet(b *testing.B) {
 
 func BenchmarkRedisWrapper_HGetAll(b *testing.B) {
 	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
-	OpenTrace(10)
+	OpenTrace(10, 50)
 
 	for i := 0; i< 500;i++ {
 		HSet("hashkey", "field" + strconv.Itoa(i), []byte("2122"))
