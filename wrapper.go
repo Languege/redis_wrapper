@@ -196,7 +196,33 @@ func(self *RedisWrapper) HSet(key,field string, value []byte) (int64, error) {
 	return redis.Int64(conn.Do("HSET", self.buildKey(key), field, value))
 }
 
+func(self *RedisWrapper) HSetValue(key,field string, value interface{}) (int64, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	defer self.Stat("HSET", time.Now())
+
+	return redis.Int64(conn.Do("HSET", self.buildKey(key), field, value))
+}
+
+//执行成功返回OK
 func(self *RedisWrapper) HMSet(key string, kv map[string]string) (string, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	defer self.Stat("HMSET", time.Now())
+
+	params := make([]interface{}, 0, 2 * len(kv)+1)
+	params = append(params, self.buildKey(key))
+	for k, v := range kv  {
+		params = append(params, k, v)
+	}
+
+	return redis.String(conn.Do("HMSET",  params...))
+}
+
+//执行成功返回OK
+func(self *RedisWrapper) HMSetValue(key string, kv map[string]interface{}) (string, error) {
 	conn := self.Get()
 	defer conn.Close()
 
@@ -263,6 +289,31 @@ func(self *RedisWrapper) HMGet(key string, fields []string) (map[string]string, 
 	return result, nil
 }
 
+func(self *RedisWrapper) HMGetInt(key string, fields []string) (map[string]int, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	defer self.Stat("HMGET", time.Now())
+
+	params := make([]interface{}, 0, len(fields)+1)
+	params = append(params, self.buildKey(key))
+	for _, v := range fields {
+		params = append(params, v)
+	}
+
+	values, err := redis.Ints(conn.Do("HMGET",  params...))
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]int, len(fields))
+	for i := 0; i < len(fields);i++ {
+		result[fields[i]] = values[i]
+	}
+
+	return result, nil
+}
+
 
 //data = 1存在，data = 0不存在
 func(self *RedisWrapper) HExist(key, field string)(int64, error) {
@@ -294,6 +345,16 @@ func(self *RedisWrapper) HGetAll(key string)(values []interface{}, err error){
 	defer self.Stat("HGETALL", time.Now())
 
 	values, err = redis.Values(conn.Do("HGETALL", self.buildKey(key)))
+	return
+}
+
+func(self *RedisWrapper) HGetAllInt(key string)(values map[string]int, err error){
+	conn := self.Get()
+	defer conn.Close()
+
+	defer self.Stat("HGETALL", time.Now())
+
+	values, err = redis.IntMap(conn.Do("HGETALL", self.buildKey(key)))
 	return
 }
 

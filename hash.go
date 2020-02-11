@@ -8,6 +8,10 @@ func HSet(key,field string, value []byte) (int64, error) {
 	return wrapper.HSet(key, field, value)
 }
 
+func HSetValue(key, field string, value interface{}) (int64, error) {
+	return wrapper.HSetValue(key, field, value)
+}
+
 func HGet(key,field string) ([]byte, error) {
 	return wrapper.HGet(key, field)
 }
@@ -33,6 +37,10 @@ func HMGet(key string,fields []string) (map[string]string, error) {
 	return wrapper.HMGet(key, fields)
 }
 
+func HMGetInt(key string,fields []string) (map[string]int, error) {
+	return wrapper.HMGetInt(key, fields)
+}
+
 func HLen(key string) (int, error) {
 	return wrapper.HLen(key)
 }
@@ -52,4 +60,13 @@ func HGetInt64(key,field string) (int64, error) {
 
 func HGetString(key,field string) (string, error) {
 	return wrapper.HGetString(key, field)
+}
+
+func HGetAllInt(key string)(ret map[string]int, err error){
+	return wrapper.HGetAllInt(key)
+}
+
+
+func HMSetValue(key string, kv map[string]interface{}) (string, error) {
+	return wrapper.HMSetValue(key, kv)
 }
