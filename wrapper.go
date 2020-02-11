@@ -806,3 +806,10 @@ func(self *RedisWrapper) TTL(key string) (int64, error){
 
 	return redis.Int64(conn.Do("TTL", self.buildKey(key)))
 }
+
+func(self *RedisWrapper) IncrBy(key string, increment int) (int, error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	return redis.Int(conn.Do("INCRBY", key, increment))
+}

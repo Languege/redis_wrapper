@@ -29,3 +29,7 @@ func SetValue(key string, value interface{}, options... interface{}) error {
 func Incr(key string) (int64, error) {
 	return wrapper.Incr(key)
 }
+
+func IncrBy(key string, increment int)(int, error) {
+	return wrapper.IncrBy(key, increment)
+}
