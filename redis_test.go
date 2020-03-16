@@ -117,5 +117,20 @@ func TestZRangeByScore(t *testing.T) {
 }
 
 
+func TestExist(t *testing.T) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+
+	Del("test")
+	ok, err := Exist("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ok {
+		t.Fatalf("Should Be False")
+	}
+}
+
+
 
 

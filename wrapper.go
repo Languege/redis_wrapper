@@ -36,26 +36,22 @@ type CommandTrace struct {
 func NewRedisWrapper(ip string, port string, password string, maxIdle int, idleTimeout time.Duration, maxActive int) *RedisWrapper{
 	addr := ip + ":" + port
 
+	options := []redis.DialOption{
+		redis.DialConnectTimeout(time.Second*20),
+		redis.DialReadTimeout(time.Second*20),
+		redis.DialWriteTimeout(time.Second*20),
+	}
+
+	if password != "" {
+		options = append(options, redis.DialPassword(password))
+	}
 	w  :=  &RedisWrapper{
 		Pool:redis.Pool{
 			MaxIdle:     maxIdle,
 			IdleTimeout: idleTimeout,
 
 			Dial: func() (redis.Conn, error) {
-				if password != "" {
-					do := redis.DialPassword(password)
-					c, err := redis.Dial("tcp", addr, do)
-					if err != nil {
-						return nil, err
-					}
-					return c, err
-				}else{
-					c, err := redis.Dial("tcp", addr)
-					if err != nil {
-						return nil, err
-					}
-					return c, err
-				}
+				return redis.Dial("tcp", addr, options...)
 			},
 
 			TestOnBorrow: func(c redis.Conn, t time.Time) error {
