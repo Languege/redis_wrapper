@@ -868,5 +868,5 @@ func(self *RedisWrapper) IncrBy(key string, increment int) (int, error) {
 	conn := self.Get()
 	defer conn.Close()
 
-	return redis.Int(conn.Do("INCRBY", key, increment))
+	return redis.Int(conn.Do("INCRBY", self.buildKey(key), increment))
 }
