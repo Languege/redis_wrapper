@@ -424,7 +424,7 @@ func(self *RedisWrapper) Expire(key string, seconds int64) error {
  * @param key string
  * @param seconds int64 unix时间戳，单位秒
  */
-func(self *RedisWrapper) ExpireAt(key string, seconds int64) error {
+func(self *RedisWrapper) ExpireAt(key string, seconds int) error {
 	conn := self.Get()
 	defer conn.Close()
 

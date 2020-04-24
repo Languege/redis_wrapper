@@ -14,9 +14,9 @@ func Expire(key string, seconds int64) error {
 
 /**
  * @param key string
- * @param seconds int64 unix时间戳，单位秒
+ * @param seconds int unix时间戳，单位秒
  */
-func ExpireAt(key string, seconds int64) error {
+func ExpireAt(key string, seconds int) error {
 	return wrapper.ExpireAt(key, seconds)
 }
 
