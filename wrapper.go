@@ -410,7 +410,7 @@ func(self *RedisWrapper) Del(key string) error {
 	return err
 }
 
-func(self *RedisWrapper) Expire(key string, seconds int64) error {
+func(self *RedisWrapper) Expire(key string, seconds int) error {
 	conn := self.Get()
 	defer conn.Close()
 

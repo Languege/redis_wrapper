@@ -8,7 +8,7 @@ func Del(key string) error {
 	return wrapper.Del(key)
 }
 
-func Expire(key string, seconds int64) error {
+func Expire(key string, seconds int) error {
 	return wrapper.Expire(key, seconds)
 }
 
