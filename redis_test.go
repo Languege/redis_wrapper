@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"fmt"
 	"encoding/json"
+	"time"
 )
 
 
@@ -18,14 +19,14 @@ import (
 //PASS
 
 func BenchmarkRedis_Del(b *testing.B) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 	for i := 0; i < b.N ; i++  {
 		Del("test")
 	}
 }
 
 func BenchmarkRedis_Set(b *testing.B) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	var err error
 	for i := 0; i < b.N ; i++  {
@@ -37,7 +38,7 @@ func BenchmarkRedis_Set(b *testing.B) {
 }
 
 func BenchmarkRedis_HSet(b *testing.B) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	var err error
 	for i := 0; i < b.N ; i++  {
@@ -49,7 +50,7 @@ func BenchmarkRedis_HSet(b *testing.B) {
 }
 
 func BenchmarkRedisWrapper_HGetAll(b *testing.B) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 	OpenTrace(10, 50)
 
 	for i := 0; i< 500;i++ {
@@ -72,7 +73,7 @@ func BenchmarkRedisWrapper_HGetAll(b *testing.B) {
 }
 
 func BenchmarkSRandMember(b *testing.B) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	for i := 0; i< 100;i++ {
 		SAdd("skey", i)
@@ -88,7 +89,7 @@ func BenchmarkSRandMember(b *testing.B) {
 }
 
 func TestSet(t *testing.T) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	err := Set("test", []byte("value"), 60, 0, false, false)
 	if err != nil {
@@ -98,7 +99,7 @@ func TestSet(t *testing.T) {
 
 func TestZAdd(t *testing.T) {
 
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	err := ZAdd("zset_test", 1.00, []byte("value"))
 	if err != nil {
@@ -107,7 +108,7 @@ func TestZAdd(t *testing.T) {
 }
 
 func TestZRangeByScore(t *testing.T) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	values, err := ZRangeByScore("zset_test", 0.0, 2.1, false, 0, 0)
 	t.Log(values, err)
@@ -118,7 +119,7 @@ func TestZRangeByScore(t *testing.T) {
 
 
 func TestExist(t *testing.T) {
-	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC")
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
 
 	Del("test")
 	ok, err := Exist("test")
@@ -129,6 +130,22 @@ func TestExist(t *testing.T) {
 	if ok {
 		t.Fatalf("Should Be False")
 	}
+}
+
+
+func TestRedisWrapper_HMSetValueWithExpire(t *testing.T) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
+
+
+	ok, err := HMSetValue("hmsetlua", map[string]interface{}{
+		"f1":"v1",
+		"f2":"v2",
+	}, 300)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(ok)
 }
 
 

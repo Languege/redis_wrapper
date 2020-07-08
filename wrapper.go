@@ -201,6 +201,7 @@ func(self *RedisWrapper) HSetValue(key,field string, value interface{}) (int64, 
 	return redis.Int64(conn.Do("HSET", self.buildKey(key), field, value))
 }
 
+
 //执行成功返回OK
 func(self *RedisWrapper) HMSet(key string, kv map[string]string) (string, error) {
 	conn := self.Get()
@@ -218,7 +219,7 @@ func(self *RedisWrapper) HMSet(key string, kv map[string]string) (string, error)
 }
 
 //执行成功返回OK
-func(self *RedisWrapper) HMSetValue(key string, kv map[string]interface{}) (string, error) {
+func(self *RedisWrapper) HMSetValue(key string, kv map[string]interface{}, extra... int64) (string, error) {
 	conn := self.Get()
 	defer conn.Close()
 
@@ -228,6 +229,19 @@ func(self *RedisWrapper) HMSetValue(key string, kv map[string]interface{}) (stri
 	params = append(params, self.buildKey(key))
 	for k, v := range kv  {
 		params = append(params, k, v)
+	}
+
+	if len(extra) > 0 && extra[0] > 0 {
+		params = append(params, extra[0])
+		script := redis.NewScript(1, `
+	 local mi = table.maxn(ARGV)
+	 local expireSeconds = ARGV[mi]
+	 table.remove(ARGV, mi)
+	 local ret = redis.call("HMSET", KEYS[1], unpack(ARGV))
+	 redis.call('expire', KEYS[1], expireSeconds)
+	 return ret
+	`)
+		return redis.String(script.Do(conn, params...))
 	}
 
 	return redis.String(conn.Do("HMSET",  params...))

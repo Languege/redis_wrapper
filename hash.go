@@ -67,6 +67,6 @@ func HGetAllInt(key string)(ret map[string]int, err error){
 }
 
 
-func HMSetValue(key string, kv map[string]interface{}) (string, error) {
-	return wrapper.HMSetValue(key, kv)
+func HMSetValue(key string, kv map[string]interface{}, params... int64) (string, error) {
+	return wrapper.HMSetValue(key, kv, params...)
 }
