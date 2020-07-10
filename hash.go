@@ -8,8 +8,8 @@ func HSet(key,field string, value []byte) (int64, error) {
 	return wrapper.HSet(key, field, value)
 }
 
-func HSetValue(key, field string, value interface{}) (int64, error) {
-	return wrapper.HSetValue(key, field, value)
+func HSetValue(key, field string, value interface{}, extra... int64) (int64, error) {
+	return wrapper.HSetValue(key, field, value, extra...)
 }
 
 func HGet(key,field string) ([]byte, error) {

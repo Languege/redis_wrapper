@@ -192,11 +192,22 @@ func(self *RedisWrapper) HSet(key,field string, value []byte) (int64, error) {
 	return redis.Int64(conn.Do("HSET", self.buildKey(key), field, value))
 }
 
-func(self *RedisWrapper) HSetValue(key,field string, value interface{}) (int64, error) {
+func(self *RedisWrapper) HSetValue(key,field string, value interface{}, extra... int64) (int64, error) {
 	conn := self.Get()
 	defer conn.Close()
 
 	defer self.Stat("HSET", time.Now())
+
+	if len(extra) > 0 && extra[0] > 0 {
+		params := []interface{}{self.buildKey(key),field,value,extra[0]}
+		script := redis.NewScript(1, `
+				local ret = redis.call('HSET', KEYS[1], ARGV[1], ARGV[2])
+				redis.call('expire', KEYS[1], ARGV[3])
+	 			return ret
+		`)
+
+		return redis.Int64(script.Do(conn, params...))
+	}
 
 	return redis.Int64(conn.Do("HSET", self.buildKey(key), field, value))
 }

@@ -148,6 +148,18 @@ func TestRedisWrapper_HMSetValueWithExpire(t *testing.T) {
 	t.Log(ok)
 }
 
+func TestRedisWrapper_HSetValueWithExpire(t *testing.T) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
+
+
+	ok, err := HSetValue("hmsetlua", "f1", "v1", 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(ok)
+}
+
 
 
 
