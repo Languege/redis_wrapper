@@ -161,5 +161,19 @@ func TestRedisWrapper_HSetValueWithExpire(t *testing.T) {
 }
 
 
+func TestRedisWrapper_SafeTryLock(t *testing.T) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
+
+
+	releaseFunc, err := SafeTryLock("dlock", 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer releaseFunc()
+
+	time.Sleep(time.Second)
+}
+
 
 

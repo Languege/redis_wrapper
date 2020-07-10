@@ -13,3 +13,8 @@ func Release(key string, uniqueID int64)(err error) {
 	return wrapper.Release(key, uniqueID)
 }
 
+
+func SafeTryLock(key string, seconds int) (releaseFunc func(), err error) {
+	return wrapper.SafeTryLock(key, seconds)
+}
+
