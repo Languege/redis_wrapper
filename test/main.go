@@ -4,15 +4,27 @@ import (
 	"github.com/Languege/redis_wrapper"
 	"fmt"
 	"strconv"
+	"time"
+	"flag"
+	"log"
 )
 
+var(
+	host, port, password string
+)
+
+func init() {
+	flag.StringVar(&host, "h", "", "-h")
+	flag.StringVar(&port, "p", "", "-p")
+	flag.StringVar(&password, "a", "", "-a")
+	flag.Parse()
+}
 /**
  *@author LanguageY++2013
  *2019/2/20 7:51 PM
  **/
 func main(){
-
-	redis_wrapper.InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", "server_0001")
+	redis_wrapper.InitConnect(host, port, password, 0, 0, time.Hour)
 
 	//var err error
 	//values, err := redis_wrapper.ZRangeByScore("zset_test", 0.0, 2.1, true, 0,0)
@@ -158,4 +170,9 @@ func main(){
 	fmt.Println(err4)
 
 
+	redis_wrapper.HSetValue("hluatest", "k1", "v1", 1000)
+
+	data, err := redis_wrapper.HGet("hluatest", "k1")
+	log.Println(err)
+	log.Println(string(data))
 }

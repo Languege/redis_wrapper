@@ -276,7 +276,7 @@ func(self *RedisWrapper) HMSetValue(key string, kv map[string]interface{}, extra
 	 local mi = table.maxn(ARGV)
 	 local expireSeconds = ARGV[mi]
 	 table.remove(ARGV, mi)
-	 local ret = redis.call("HMSET", KEYS[1], unpack(ARGV))
+	 local ret = redis.call('HMSET', KEYS[1], unpack(ARGV))
 	 redis.call('expire', KEYS[1], expireSeconds)
 	 return ret
 	`)
