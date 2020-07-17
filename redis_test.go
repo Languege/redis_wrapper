@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"time"
+	"sync"
 )
 
 
@@ -176,4 +177,49 @@ func TestRedisWrapper_SafeTryLock(t *testing.T) {
 }
 
 
+func Benchmark_SafeTryLock(b *testing.B) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
+	wg := sync.WaitGroup{}
+	for i := 0;i < b.N; i ++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			releaseFunc, err := SafeTryLock("dlock", 10)
+			if err != nil  {
+				return
+			}
+
+
+			 err = releaseFunc()
+			 if err != nil {
+				b.Fatal(err)
+			 }
+		}()
+	}
+
+	wg.Wait()
+}
+
+
+func BenchmarkSafeTryLock(b *testing.B) {
+	InitConnect("127.0.0.1", "6379", "SjhkHD3J5k6H8SjSbK3SC", 1, 1, time.Hour)
+	wg := sync.WaitGroup{}
+	for i := 0;i < b.N; i ++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			lockId, err := TryLock("dlock", 10)
+			if err != nil {
+				return
+			}
+
+			err = Release("dlock", lockId)
+			if err != nil {
+				b.Fatal(err.Error())
+			}
+		}()
+	}
+
+	wg.Wait()
+}
 

@@ -152,7 +152,7 @@ func(self *RedisWrapper) GetConn() redis.Conn{
 	return self.Get()
 }
 
-func(self *RedisWrapper) SafeTryLock(key string, seconds int) (releaseCallback func(), err error) {
+func(self *RedisWrapper) SafeTryLock(key string, seconds int) (releaseCallback func() error, err error) {
 	conn := self.Get()
 
 	defer self.Stat("TryLock", time.Now())
@@ -163,7 +163,7 @@ func(self *RedisWrapper) SafeTryLock(key string, seconds int) (releaseCallback f
 		return
 	}
 
-	releaseCallback = func() {
+	releaseCallback = func() (err error){
 				script := redis.NewScript(1, `
 	 					if redis.call("get",KEYS[1]) == ARGV[1] then
           						return redis.call("del",KEYS[1])
@@ -175,6 +175,7 @@ func(self *RedisWrapper) SafeTryLock(key string, seconds int) (releaseCallback f
 				_, err = script.Do(conn, self.buildKey(key), uniqueID)
 
 				conn.Close()
+				return
 	}
 
 	return

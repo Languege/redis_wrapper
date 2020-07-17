@@ -14,7 +14,7 @@ func Release(key string, uniqueID int64)(err error) {
 }
 
 
-func SafeTryLock(key string, seconds int) (releaseFunc func(), err error) {
+func SafeTryLock(key string, seconds int) (releaseFunc func() error, err error) {
 	return wrapper.SafeTryLock(key, seconds)
 }
 
