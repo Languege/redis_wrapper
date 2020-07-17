@@ -58,7 +58,8 @@ func NewRedisWrapper(ip string, port string, password string, maxIdle int, idleT
 				_, err := c.Do("PING")
 				return err
 			},
-			MaxActive:maxActive,
+			MaxActive: maxActive,
+			Wait:      true,
 		},
 	}
 
