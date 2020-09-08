@@ -175,4 +175,12 @@ func main(){
 	data, err := redis_wrapper.HGet("hluatest", "k1")
 	log.Println(err)
 	log.Println(string(data))
+
+	{
+		redis_wrapper.LPush("listtest", []byte("k1"))
+		ret, err := redis_wrapper.LLen("listtest")
+		log.Println(err)
+		log.Println(ret)
+	}
+
 }

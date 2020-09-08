@@ -23,3 +23,7 @@ func LPop(key string) ([]byte, error) {
 func LRange(key string, start, stop int)(ret []string, err error) {
 	return wrapper.LRange(key, start, stop)
 }
+
+func LLen(key string)(ret int64, err error) {
+	return wrapper.LLen(key)
+}

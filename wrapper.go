@@ -541,6 +541,15 @@ func(self *RedisWrapper) LRange(key string, start, stop int)(ret []string, err e
 	return redis.Strings(conn.Do("LRANGE", self.buildKey(key), start, stop))
 }
 
+func(self *RedisWrapper) LLen(key string)(ret int64, err error) {
+	conn := self.Get()
+	defer conn.Close()
+
+	defer self.Stat("LLEN", time.Now())
+
+	return redis.Int64(conn.Do("LLEN", self.buildKey(key)))
+}
+
 func(self *RedisWrapper)  FlushAll()(err error){
 	conn := self.Get()
 	defer conn.Close()
